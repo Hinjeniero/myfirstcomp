@@ -42,29 +42,23 @@ bool SpecificWorker::setParams(RoboCompCommonBehavior::ParameterList params)
 
 void SpecificWorker::compute()
 {
-    const float threshold = 20; //millimeters
+    const float threshold = 210; //millimeters
     float rot = 0.6;  //rads per second
 
     try
     {
         RoboCompLaser::TLaserData ldata = laser_proxy->getLaserData();  //read laser data 
         std::sort(ldata.begin(), ldata.end(), [](RoboCompLaser::TData a, RoboCompLaser::TData b){ return a.dist < b.dist; }) ;  //sort laser data from small to large distances using a lambda function.
-        
-	if(ldata.front().dist < threshold)
+	differentialrobot_proxy->setSpeedBase(400, 0);
+	if(ldata[20].dist < threshold)
 	{
 		std::cout << ldata.front().dist << std::endl;
- 		differentialrobot_proxy->setSpeedBase(10, rot);
+ 		//differentialrobot_proxy->setSpeedBase(10, rot);
+		differentialrobot_proxy->setSpeedBase(0, 1);
 		usleep(rand()%(1500000-100000 + 1) + 100000);  //random wait between 1.5s and 0.1sec
 	}
-	else
-	{
-	  char *intStr = itoa(a);
-	string str = string(intStr);
-		std::cout << ldata.front().dist << std::endl;
-		std::cout <<"SIZE: "+ldata.size() << std::endl;
-		differentialrobot_proxy->setSpeedBase(400, 0); 
-  	}
     }
+    
     catch(const Ice::Exception &ex)
     {
         std::cout << ex << std::endl;
@@ -80,6 +74,15 @@ void SpecificWorker::compute()
 // 		std::cout << "Error reading from Camera" << e << std::endl;
 // 	}
 }
+
+void SpecificWorker::setPick(const RoboCompRCISMousePicker::Pick& pick)
+{
+  std::cout << "Testing";
+  std::cout << "x -> " << pick.x;
+  std::cout << "z -> " << pick.z;
+  
+}
+
 
 
 

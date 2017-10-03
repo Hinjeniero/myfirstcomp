@@ -16,40 +16,26 @@
  *    You should have received a copy of the GNU General Public License
  *    along with RoboComp.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include "rcismousepickerI.h"
 
-/**
-       \brief
-       @author authorname
-*/
-
-
-
-
-
-
-
-#ifndef SPECIFICWORKER_H
-#define SPECIFICWORKER_H
-
-#include <genericworker.h>
-#include <innermodel/innermodel.h>
-
-class SpecificWorker : public GenericWorker
+RCISMousePickerI::RCISMousePickerI(GenericWorker *_worker, QObject *parent) : QObject(parent)
 {
-Q_OBJECT
-public:
-	SpecificWorker(MapPrx& mprx);	
-	~SpecificWorker();
-	void setPick(const RoboCompRCISMousePicker::Pick& pick);
-	bool setParams(RoboCompCommonBehavior::ParameterList params);
+	worker = _worker;
+	mutex = worker->mutex;       // Shared worker mutex
+}
 
 
-public slots:
-	void compute(); 	
+RCISMousePickerI::~RCISMousePickerI()
+{
+}
 
-private:
-	
-};
+void RCISMousePickerI::setPick(const Pick  &myPick, const Ice::Current&)
+{
+	worker->setPick(myPick);
+}
 
-#endif
+
+
+
+
 

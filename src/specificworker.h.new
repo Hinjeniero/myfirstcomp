@@ -40,9 +40,9 @@ Q_OBJECT
 public:
 	SpecificWorker(MapPrx& mprx);	
 	~SpecificWorker();
-	void setPick(const RoboCompRCISMousePicker::Pick& pick);
 	bool setParams(RoboCompCommonBehavior::ParameterList params);
 
+	void setPick(const Pick &myPick);
 
 public slots:
 	void compute(); 	
