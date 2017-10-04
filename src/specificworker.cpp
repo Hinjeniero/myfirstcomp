@@ -42,21 +42,39 @@ bool SpecificWorker::setParams(RoboCompCommonBehavior::ParameterList params)
 
 void SpecificWorker::compute()
 {
-    const float threshold = 210; //millimeters
-    float rot = 0.6;  //rads per second
+    //const float threshold = 210; //millimeters
+    //float rot = 0.6;  //rads per second
 
     try
     {
-        RoboCompLaser::TLaserData ldata = laser_proxy->getLaserData();  //read laser data 
+	differentialrobot_proxy->getBaseState(state);
+	inner->updateTransformValues("base", state.x, 0, state.z, 0, state.alpha);
+	if(state.isEmpty() == false){
+	  QVec tR = inner->transform("robot", QVec::vec3(2, 0, 3));//Have no idea where those come from, might have to ask (2 == tx; 3 = tz)
+	  float d = tR.norm2();
+	  if (d>MINDISTANCE){
+	    float adv = d;
+	    float rot = atan2(tR.x(), tR.z());
+	    if (adv>MAXVEL)
+	      adv = MAXVEL;
+	    if (rot>MAXROT)
+	      rot=MAXROT;
+	    differentialrobot_proxy->setSpeedBase(adv, rot);
+	  }else{
+	    differentialrobot_proxy->setSpeedBase(0, 0);
+	    state.setEmpty();
+	  }
+	}
+	/*RoboCompLaser::TLaserData ldata = laser_proxy->getLaserData();  //read laser data 
         std::sort(ldata.begin(), ldata.end(), [](RoboCompLaser::TData a, RoboCompLaser::TData b){ return a.dist < b.dist; }) ;  //sort laser data from small to large distances using a lambda function.
 	differentialrobot_proxy->setSpeedBase(400, 0);
 	if(ldata[20].dist < threshold)
 	{
-		std::cout << ldata.front().dist << std::endl;
+		//std::cout << ldata.front().dist << std::endl;
  		//differentialrobot_proxy->setSpeedBase(10, rot);
 		differentialrobot_proxy->setSpeedBase(0, 1);
 		usleep(rand()%(1500000-100000 + 1) + 100000);  //random wait between 1.5s and 0.1sec
-	}
+	}*/
     }
     
     catch(const Ice::Exception &ex)
@@ -77,10 +95,12 @@ void SpecificWorker::compute()
 
 void SpecificWorker::setPick(const RoboCompRCISMousePicker::Pick& pick)
 {
-  std::cout << "Testing";
-  std::cout << "x -> " << pick.x;
-  std::cout << "z -> " << pick.z;
-  
+	state.setX(pick.x); //Dunno if setting the target is done like this
+	state.setZ(pick.z);
+	state.setTarget();
+	std::cout << "Location x -> " << pick.x << " was chosen." << endl;
+	std::cout << "Location x -> " << pick.z << " was chosen." << endl; 
+	
 }
 
 

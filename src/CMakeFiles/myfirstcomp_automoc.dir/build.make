@@ -43,10 +43,10 @@ RM = /usr/bin/cmake -E remove -f
 EQUALS = =
 
 # The top-level source directory on which CMake was run.
-CMAKE_SOURCE_DIR = /home/salabeta/robocomp/components/myfirstcomp
+CMAKE_SOURCE_DIR = /home/salabeta/robogrupo9/myfirstcomp
 
 # The top-level build directory on which CMake was run.
-CMAKE_BINARY_DIR = /home/salabeta/robocomp/components/myfirstcomp
+CMAKE_BINARY_DIR = /home/salabeta/robogrupo9/myfirstcomp
 
 # Utility rule file for myfirstcomp_automoc.
 
@@ -54,8 +54,8 @@ CMAKE_BINARY_DIR = /home/salabeta/robocomp/components/myfirstcomp
 include src/CMakeFiles/myfirstcomp_automoc.dir/progress.make
 
 src/CMakeFiles/myfirstcomp_automoc:
-	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/salabeta/robocomp/components/myfirstcomp/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Automatic moc for target myfirstcomp"
-	cd /home/salabeta/robocomp/components/myfirstcomp/src && /usr/bin/cmake -E cmake_autogen /home/salabeta/robocomp/components/myfirstcomp/src/CMakeFiles/myfirstcomp_automoc.dir/ ""
+	@$(CMAKE_COMMAND) -E cmake_echo_color --switch=$(COLOR) --blue --bold --progress-dir=/home/salabeta/robogrupo9/myfirstcomp/CMakeFiles --progress-num=$(CMAKE_PROGRESS_1) "Automatic moc for target myfirstcomp"
+	cd /home/salabeta/robogrupo9/myfirstcomp/src && /usr/bin/cmake -E cmake_autogen /home/salabeta/robogrupo9/myfirstcomp/src/CMakeFiles/myfirstcomp_automoc.dir/ Debug
 
 myfirstcomp_automoc: src/CMakeFiles/myfirstcomp_automoc
 myfirstcomp_automoc: src/CMakeFiles/myfirstcomp_automoc.dir/build.make
@@ -68,10 +68,10 @@ src/CMakeFiles/myfirstcomp_automoc.dir/build: myfirstcomp_automoc
 .PHONY : src/CMakeFiles/myfirstcomp_automoc.dir/build
 
 src/CMakeFiles/myfirstcomp_automoc.dir/clean:
-	cd /home/salabeta/robocomp/components/myfirstcomp/src && $(CMAKE_COMMAND) -P CMakeFiles/myfirstcomp_automoc.dir/cmake_clean.cmake
+	cd /home/salabeta/robogrupo9/myfirstcomp/src && $(CMAKE_COMMAND) -P CMakeFiles/myfirstcomp_automoc.dir/cmake_clean.cmake
 .PHONY : src/CMakeFiles/myfirstcomp_automoc.dir/clean
 
 src/CMakeFiles/myfirstcomp_automoc.dir/depend:
-	cd /home/salabeta/robocomp/components/myfirstcomp && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/salabeta/robocomp/components/myfirstcomp /home/salabeta/robocomp/components/myfirstcomp/src /home/salabeta/robocomp/components/myfirstcomp /home/salabeta/robocomp/components/myfirstcomp/src /home/salabeta/robocomp/components/myfirstcomp/src/CMakeFiles/myfirstcomp_automoc.dir/DependInfo.cmake --color=$(COLOR)
+	cd /home/salabeta/robogrupo9/myfirstcomp && $(CMAKE_COMMAND) -E cmake_depends "Unix Makefiles" /home/salabeta/robogrupo9/myfirstcomp /home/salabeta/robogrupo9/myfirstcomp/src /home/salabeta/robogrupo9/myfirstcomp /home/salabeta/robogrupo9/myfirstcomp/src /home/salabeta/robogrupo9/myfirstcomp/src/CMakeFiles/myfirstcomp_automoc.dir/DependInfo.cmake --color=$(COLOR)
 .PHONY : src/CMakeFiles/myfirstcomp_automoc.dir/depend
 
