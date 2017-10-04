@@ -36,6 +36,7 @@ SpecificWorker::~SpecificWorker()
 
 bool SpecificWorker::setParams(RoboCompCommonBehavior::ParameterList params)
 {
+	inner = new InnerModel("/home/robocomp/robocomp/files/innermodel/simpleworld.xml");
 	timer.start(Period);
 	return true;
 }
@@ -47,25 +48,47 @@ void SpecificWorker::compute()
 
     try
     {
+	RoboCompDifferentialRobot::TBaseState state;
 	differentialrobot_proxy->getBaseState(state);
-	inner->updateTransformValues("base", state.x, 0, state.z, 0, state.alpha);
-	if(state.isEmpty() == false){
-	  QVec tR = inner->transform("robot", QVec::vec3(2, 0, 3));//Have no idea where those come from, might have to ask (2 == tx; 3 = tz)
+	inner->updateTransformValues("base", state.x, 0, state.z, 0, state.alpha, 0);
+	if(target.isEmpty() == false)
+	{
+	  std::pair<float, float> t = target.getTarget();
+	  QVec tR = inner->transform("base", QVec::vec3(t.first, 0, t.second), "world");
 	  float d = tR.norm2();
-	  if (d>MINDISTANCE){
+	  if (d > MINDISTANCE)
+	  {
 	    float adv = d;
 	    float rot = atan2(tR.x(), tR.z());
-	    if (adv>MAXVEL)
-	      adv = MAXVEL;
-	    if (rot>MAXROT)
-	      rot=MAXROT;
+	    if (adv > MAXVEL) adv = MAXVEL;
+	    if (rot > MAXROT) rot = MAXROT;
 	    differentialrobot_proxy->setSpeedBase(adv, rot);
-	  }else{
+	  }
+	  else
+	  {
 	    differentialrobot_proxy->setSpeedBase(0, 0);
-	    state.setEmpty();
+	    target.setEmpty();
 	  }
 	}
-	/*RoboCompLaser::TLaserData ldata = laser_proxy->getLaserData();  //read laser data 
+	
+    }
+    catch(const Ice::Exception &ex)
+    {
+        std::cout << ex << std::endl;
+    }
+}
+
+void SpecificWorker::setPick(const RoboCompRCISMousePicker::Pick& pick)
+{
+	target.setTarget(pick.x, pick.z);
+	std::cout << "Location x -> " << pick.x << " was chosen." << endl;
+	std::cout << "Location x -> " << pick.z << " was chosen." << endl; 
+}
+
+
+
+
+/*RoboCompLaser::TLaserData ldata = laser_proxy->getLaserData();  //read laser data 
         std::sort(ldata.begin(), ldata.end(), [](RoboCompLaser::TData a, RoboCompLaser::TData b){ return a.dist < b.dist; }) ;  //sort laser data from small to large distances using a lambda function.
 	differentialrobot_proxy->setSpeedBase(400, 0);
 	if(ldata[20].dist < threshold)
@@ -75,12 +98,9 @@ void SpecificWorker::compute()
 		differentialrobot_proxy->setSpeedBase(0, 1);
 		usleep(rand()%(1500000-100000 + 1) + 100000);  //random wait between 1.5s and 0.1sec
 	}*/
-    }
-    
-    catch(const Ice::Exception &ex)
-    {
-        std::cout << ex << std::endl;
-    }
+
+
+
 // 	try
 // 	{
 // 		camera_proxy->getYImage(0,img, cState, bState);
@@ -91,22 +111,3 @@ void SpecificWorker::compute()
 // 	{
 // 		std::cout << "Error reading from Camera" << e << std::endl;
 // 	}
-}
-
-void SpecificWorker::setPick(const RoboCompRCISMousePicker::Pick& pick)
-{
-	state.setX(pick.x); //Dunno if setting the target is done like this
-	state.setZ(pick.z);
-	state.setTarget();
-	std::cout << "Location x -> " << pick.x << " was chosen." << endl;
-	std::cout << "Location x -> " << pick.z << " was chosen." << endl; 
-	
-}
-
-
-
-
-
-
-
-

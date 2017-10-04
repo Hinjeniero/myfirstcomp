@@ -47,25 +47,37 @@ public slots:
 	void compute(); 	
 
 private:
-	InnerModel *inner = new InnerModel("/home/salabeta/robocomp/files/innermodel/simpleworld.xml");
-	struct BState state
+	InnerModel *inner;
+	struct Target
 	{
-	    //--attributes--//
-	    bool target;
+	    bool empty = true;
 	    float x;
 	    float z;
-	    float alpha;
-	    //--methods--//
-	    bool isEmpty(){return !target;} 
-	    void setEmpty(){target=false;}
-	    void setTarget(){target=true;}
-	    float getX(){return x;}
-	    float getZ(){return z;}
-	    float getAlpha(){return alpha;}
-	    float setX(int _x){x=_x;}
-	    float setZ(int _z){z=_z;}
-	    float setAlpha(int _alpha){alpha=_alpha;}
+	    QMutex mutex;
+	    bool isEmpty()
+	    {
+	      QMutexLocker ml(&mutex);
+	      return empty;
+	    } 
+	    
+	    void setEmpty()
+	    {
+	      QMutexLocker ml(&mutex);
+	      empty = true;
+	    };
+	    void setTarget(float x_, float z_)
+	    {
+	      QMutexLocker ml(&mutex);
+	      x = x_;
+	      z = z_;
+	    };	    
+	    std::pair<float, float> getTarget()
+	    {
+	      QMutexLocker ml(&mutex);
+	      return std::make_pair(x,z);
+	    };
 	};
+	Target target;
 };
 
 #endif
