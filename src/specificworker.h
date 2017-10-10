@@ -1,4 +1,5 @@
 /*
+
  *    Copyright (C) 2017 by YOUR NAME HERE
  *
  *    This file is part of RoboComp
@@ -30,7 +31,7 @@
 #include <innermodel/innermodel.h>
 
 #define MAXVEL 400
-#define MAXROT 0.9
+#define MAXROT 1
 #define MINDISTANCE 50
 
 class SpecificWorker : public GenericWorker
@@ -39,8 +40,11 @@ Q_OBJECT
 public:
 	SpecificWorker(MapPrx& mprx);	
 	~SpecificWorker();
+	const float EulerConstant = std::exp(1.0);
 	void setPick(const RoboCompRCISMousePicker::Pick& pick);
 	bool setParams(RoboCompCommonBehavior::ParameterList params);
+	float getGauss(float Vr, float Vx, float h);
+	float getSigmoid(float distance);
 
 
 public slots:
@@ -68,6 +72,7 @@ private:
 	    void setTarget(float x_, float z_)
 	    {
 	      QMutexLocker ml(&mutex);
+	      empty = false;
 	      x = x_;
 	      z = z_;
 	    };	    

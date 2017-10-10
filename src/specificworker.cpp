@@ -43,25 +43,25 @@ bool SpecificWorker::setParams(RoboCompCommonBehavior::ParameterList params)
 
 void SpecificWorker::compute()
 {
-    //const float threshold = 210; //millimeters
-    //float rot = 0.6;  //rads per second
-
     try
     {
 	RoboCompDifferentialRobot::TBaseState state;
 	differentialrobot_proxy->getBaseState(state);
-	inner->updateTransformValues("base", state.x, 0, state.z, 0, state.alpha, 0);
+	inner->updateTransformValues("base", state.x, 0, state.z, 0, state.alpha, 0); //Transforms the robot's vector to the world's point of view. (Or vice versa, don't remember).
 	if(target.isEmpty() == false)
 	{
 	  std::pair<float, float> t = target.getTarget();
-	  QVec tR = inner->transform("base", QVec::vec3(t.first, 0, t.second), "world");
-	  float d = tR.norm2();
+	  QVec tR = inner->transform("base", QVec::vec3(t.first, 0, t.second), "world"); //Vector's source is robot's location, vector's end is the mouse pick
+	  float d = tR.norm2(); //Gets the distance, that equals the vector's module
 	  if (d > MINDISTANCE)
 	  {
-	    float adv = d;
+	    float adv;
 	    float rot = atan2(tR.x(), tR.z());
-	    if (adv > MAXVEL) adv = MAXVEL;
 	    if (rot > MAXROT) rot = MAXROT;
+	    adv = MAXVEL * getSigmoid(d) * getGauss(rot, 0.3, 0.5);
+	    std::cout << "Sigmoid - " << getSigmoid(d) << endl;
+	    std::cout << "Gauss - " << getGauss(rot, 0.3, 0.5) << endl;
+	    std::cout << "Vel is - " << adv << endl;
 	    differentialrobot_proxy->setSpeedBase(adv, rot);
 	  }
 	  else
@@ -78,11 +78,20 @@ void SpecificWorker::compute()
     }
 }
 
+float SpecificWorker::getGauss(float Vr, float Vx, float h){
+  float lambda = -pow(Vx, 2)/log(h);
+  return pow(EulerConstant, (-pow(Vr, 2)/lambda));
+}
+
+float SpecificWorker::getSigmoid(float distance){
+  return (1/1+pow(EulerConstant, -distance))-0.5;
+}
+
 void SpecificWorker::setPick(const RoboCompRCISMousePicker::Pick& pick)
 {
 	target.setTarget(pick.x, pick.z);
 	std::cout << "Location x -> " << pick.x << " was chosen." << endl;
-	std::cout << "Location x -> " << pick.z << " was chosen." << endl; 
+	std::cout << "Location z -> " << pick.z << " was chosen." << endl; 
 }
 
 
