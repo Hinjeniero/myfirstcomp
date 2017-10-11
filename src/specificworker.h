@@ -34,6 +34,9 @@
 #define MAXROT 1
 #define MINDISTANCE 50
 
+
+
+
 class SpecificWorker : public GenericWorker
 {
 Q_OBJECT
@@ -45,6 +48,8 @@ public:
 	bool setParams(RoboCompCommonBehavior::ParameterList params);
 	float getGauss(float Vr, float Vx, float h);
 	float getSigmoid(float distance);
+	enum State {IDLE, GOTO, TURN, AVOID, END};
+	State state = State::IDLE;
 
 
 public slots:
