@@ -47,7 +47,6 @@ void SpecificWorker::compute()
     {
 	RoboCompLaser::TLaserData ldata = laser_proxy->getLaserData();  //read laser data 
 	std::sort(ldata.begin(), ldata.end(), [](RoboCompLaser::TData a, RoboCompLaser::TData b){ return a.dist < b.dist; }) ;  //sort laser data from small to large distances using a lambda function.
-	int threshold = 200;
 	switch(robotState) {
 	  case State::IDLE:
 	  {
@@ -56,43 +55,17 @@ void SpecificWorker::compute()
 	    break;
 	  }
 	  case State::GOTO:
-	  {
-	    RoboCompDifferentialRobot::TBaseState state;
-	    differentialrobot_proxy->getBaseState(state);
-	    inner->updateTransformValues("base", state.x, 0, state.z, 0, state.alpha, 0); //Transforms the robot's vector to the world's point of view. (Or vice versa, don't remember).	    
-	    std::pair<float, float> t = target.getTarget();
-	    QVec tR = inner->transform("base", QVec::vec3(t.first, 0, t.second), "world"); //Vector's source is robot's location, vector's end is the mouse pick
-	    float d = tR.norm2(); //Gets the distance, that equals the vector's module
-	    if (d > MINDISTANCE) {
-	      float adv;
-	      float rot = atan2(tR.x(), tR.z());
-	      if (rot > MAXROT) rot = MAXROT;
-	      adv = MAXVEL * getSigmoid(d) * getGauss(rot, 0.3, 0.5);
-	      std::cout << "-------------------------"<< endl;
-	      std::cout << "Sigmoid - " << getSigmoid(d) << endl;
-	      std::cout << "Gauss - " << getGauss(rot, 0.3, 0.5) << endl;
-	      std::cout << "Vel is - " << adv << endl;
-	      std::cout << "Rotation is - " << rot << endl;
-	      std::cout << "Distance is - " << d << endl;
-	      std::cout << "-------------------------"<< endl;
-	      differentialrobot_proxy->setSpeedBase(adv, rot);
-	      /**/
-	      if(ldata[20].dist < threshold){
-		robotState = State::TURN;
-	      }
-	    } else {
-	      differentialrobot_proxy->setSpeedBase(0, 0);
-	      target.setEmpty();
-	      robotState = State::END;
-	    }	    
+	  	    
 	    break;
 	  }
 	  case State::TURN:
 	    std::cout << "TURN STATE!" << endl;
-	    robotState = State::AVOID;
+	    if(ldata[20].dist > threshold){
+		robotState = State::AVOID; 
 	    break;
 	  case State::AVOID:
 	    std::cout << "AVOID STATE!" << endl;
+	    
 	    robotState = State::GOTO;
 	    break;
 	  case State::END:
@@ -105,6 +78,45 @@ void SpecificWorker::compute()
     {
         std::cout << ex << std::endl;
     }
+}
+
+void SpecificWorker::goToTarget(RoboCompLaser::TLaserData ldata){
+    if(ldata[20].dist < threshold){ /*Obstacle sorting*/
+      differentialrobot_proxy->setSpeedBase(0, 0);
+      robotState = State::TURN;
+      return;
+    }
+    //All variables are needed to calculate distance
+    RoboCompDifferentialRobot::TBaseState state;
+    differentialrobot_proxy->getBaseState(state);
+    inner->updateTransformValues("base", state.x, 0, state.z, 0, state.alpha, 0); //Transforms the robot's vector to the world's point of view. (Or vice versa, don't remember).	    
+    std::pair<float, float> t = target.getTarget();
+    QVec tR = inner->transform("base", QVec::vec3(t.first, 0, t.second), "world"); //Vector's source is robot's location, vector's end is the mouse pick
+    float d = tR.norm2(); //Gets the distance, that equals the vector's module
+    //If no exit conditions
+    if(d < MINDISTANCE){
+      robotState = State::END;
+      target.setEmpty();
+      std::cout << "The bomb has been planted." <<endl;
+      return;
+    }else{
+      /**/
+      float adv;
+      float rot = atan2(tR.x(), tR.z());
+      if (rot > MAXROT) rot = MAXROT;
+      adv = MAXVEL * getSigmoid(d) * getGauss(rot, 0.3, 0.5);
+      printState(d, adv, rot); //TODO this will be deleted
+      differentialrobot_proxy->setSpeedBase(adv, rot);
+}
+
+void SpecificWorker::printState(float d, float adv, float rot){
+      std::cout << "-------------------------"<< endl;
+      std::cout << "Sigmoid - " << getSigmoid(d) << endl;
+      std::cout << "Gauss - " << getGauss(rot, 0.3, 0.5) << endl;
+      std::cout << "Vel is - " << adv << endl;
+      std::cout << "Rotation is - " << rot << endl;
+      std::cout << "Distance is - " << d << endl;
+      std::cout << "-------------------------"<< endl;
 }
 
 float SpecificWorker::getGauss(float Vr, float Vx, float h){

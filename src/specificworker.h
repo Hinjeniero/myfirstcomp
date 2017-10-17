@@ -33,9 +33,7 @@
 #define MAXVEL 400
 #define MAXROT 1
 #define MINDISTANCE 50
-
-
-
+#define threshold 400
 
 class SpecificWorker : public GenericWorker
 {
@@ -44,12 +42,14 @@ public:
 	SpecificWorker(MapPrx& mprx);	
 	~SpecificWorker();
 	const float EulerConstant = std::exp(1.0);
+	void goToTarget(RoboCompLaser::TLaserData ldata);
+	void printState(float d, float adv, float rot);
 	void setPick(const RoboCompRCISMousePicker::Pick& pick);
 	bool setParams(RoboCompCommonBehavior::ParameterList params);
 	float getGauss(float Vr, float Vx, float h);
 	float getSigmoid(float distance);
 	enum State {IDLE, GOTO, TURN, AVOID, END};
-	State state = State::IDLE;
+	State robotState = State::IDLE;
 
 
 public slots:
