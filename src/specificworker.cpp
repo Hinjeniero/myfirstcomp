@@ -44,10 +44,8 @@ bool SpecificWorker::setParams(RoboCompCommonBehavior::ParameterList params)
 void SpecificWorker::compute(){
   try
   {
-      RoboCompLaser::TLaserData ldata = laser_proxy->getLaserData(); //TODO TEST, delete
-      RoboCompLaser::TLaserData ldata2 = laser_proxy->getLaserData();  //read laser data 
+      RoboCompLaser::TLaserData ldata = laser_proxy->getLaserData();
       std::sort(ldata.begin(), ldata.end(), [](RoboCompLaser::TData a, RoboCompLaser::TData b){ return a.dist < b.dist; }) ;  //sort laser data from small to large distances using a lambda function.
-      printLaser(ldata2, 0, 100);//TODO TEST, delete
       switch(robotState) {
 	case State::IDLE: 
 	  idleState();
@@ -71,25 +69,19 @@ void SpecificWorker::compute(){
       std::cout << ex << std::endl;
   }
 }
-
-void SpecificWorker::printLaser( RoboCompLaser::TLaserData data, int start, int end ) {//TODO TEST, delete
-  std::cout << "STARTING FOR!----------------------------------------------------" << std::endl;
-  std::cout << "SIZE ->" << data.size() << endl;
-  for (int i=start+10; i<end-10; i++) //The aser's array first and last 10 positions are invalid (hits the robot's tapa typical spanish)
-    std::cout << "Dato " << i << "->" << data[i].dist << std::endl;
-  std::cout << "ENDING FOR!------------------------------------------------------" << std::endl;
-}
 	  
 void SpecificWorker::idleState(){
   if (!target.isEmpty())
     robotState = State::GOTO;
+  differentialrobot_proxy->setSpeedBase(0, 0);
+  
 }
-void SpecificWorker::gotoState(RoboCompLaser::TLaserData ldata){
-  if(ldata[20].dist < threshold){ /*Obstacle sorting*/
-    differentialrobot_proxy->setSpeedBase(0, 0);
-    robotState = State::TURN;
-    return;
-  }
+void SpecificWorker::gotoState(RoboCompLaser::TLaserData ldata) {
+  //if(ldata[20].dist < threshold){ /*Obstacle sorting*/
+  //  differentialrobot_proxy->setSpeedBase(0, 0);
+  //  robotState = State::IDLE;
+  //  return;
+  //}
   //All variables are needed to calculate distance
   RoboCompDifferentialRobot::TBaseState state;
   differentialrobot_proxy->getBaseState(state);
@@ -99,7 +91,7 @@ void SpecificWorker::gotoState(RoboCompLaser::TLaserData ldata){
   float d = tR.norm2(); //Gets the distance, that equals the vector's module
   //If no exit conditions
   if(d < MINDISTANCE){
-    robotState = State::END;
+    robotState = State::IDLE;
     target.setEmpty();
     std::cout << "The bomb has been planted." <<endl;
     return;
