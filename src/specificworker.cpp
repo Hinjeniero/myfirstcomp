@@ -45,7 +45,7 @@ void SpecificWorker::compute(){
   try
   {
       RoboCompLaser::TLaserData ldata = laser_proxy->getLaserData();
-      std::sort(ldata.begin(), ldata.end(), [](RoboCompLaser::TData a, RoboCompLaser::TData b){ return a.dist < b.dist; }) ;  //sort laser data from small to large distances using a lambda function.
+      //std::sort(ldata.begin(), ldata.end(), [](RoboCompLaser::TData a, RoboCompLaser::TData b){ return a.dist < b.dist; }) ;  //sort laser data from small to large distances using a lambda function.
       switch(robotState) {
 	case State::IDLE: 
 	  idleState();
@@ -77,11 +77,13 @@ void SpecificWorker::idleState(){
   
 }
 void SpecificWorker::gotoState(RoboCompLaser::TLaserData ldata) {
-  //if(ldata[20].dist < threshold){ /*Obstacle sorting*/
-  //  differentialrobot_proxy->setSpeedBase(0, 0);
-  //  robotState = State::IDLE;
-  //  return;
-  //}
+  if(obstacle(ldata)){ /*Obstacle detected, left and right side*/
+   differentialrobot_proxy->setSpeedBase(0, 0);
+   robotState = State::TURN;
+   decideTurnDirection(ldata);
+   return;
+  }
+
   //All variables are needed to calculate distance
   RoboCompDifferentialRobot::TBaseState state;
   differentialrobot_proxy->getBaseState(state);
@@ -96,7 +98,7 @@ void SpecificWorker::gotoState(RoboCompLaser::TLaserData ldata) {
     std::cout << "The bomb has been planted." <<endl;
     return;
   }else{
-    /**/
+    /*We do continue on the GOTO state*/
     float adv;
     float rot = atan2(tR.x(), tR.z());
     if (rot > MAXROT) rot = MAXROT;
@@ -107,22 +109,63 @@ void SpecificWorker::gotoState(RoboCompLaser::TLaserData ldata) {
 }
 
 void SpecificWorker::turnState (RoboCompLaser::TLaserData ldata) {
-  if(ldata[20].dist > threshold){ /*Obstacle sorting*/
+  if(!checkIfStillObstacle(ldata)){ /*Obstacle sorting, checks if there is still an obstacle*/
     differentialrobot_proxy->setSpeedBase(0, 0);
     std::cout << "Changing to State AVOID"<< endl;
     robotState = State::AVOID;
     return;
   }
-  differentialrobot_proxy->setSpeedBase(0, -1);      
+  if(turnDirection == Turn::LEFT)
+    differentialrobot_proxy->setSpeedBase(0, -1);      
+  else
+    differentialrobot_proxy->setSpeedBase(0, 1); 
 }
 
 void SpecificWorker::avoidState (RoboCompLaser::TLaserData ldata){
   std::cout << "AVOID STATE!" << endl;
-  robotState = State::GOTO;
+  
+  if(targetAtSight(ldata) || cutVector) //TODO the two methods, implement them 
+    robotState = State::GOTO;
 }
 void SpecificWorker::endState(){
   std::cout << "END STATE!" << endl;
   robotState = State::IDLE;
+}
+
+bool SpecificWorker::targetAtSight(RoboCompLaser::TLaserData ldata) /*TODO fix copy-paste*/
+{
+//   QPolygonF polygon;
+//   for (auto l, lasercopy)
+//   {
+//     QVec lr = innermodel->laserTo("world", "laser", l.dist, l.angle)
+//     polygon << QPointF(lr.x(), lr.z());
+//   }
+//   QVec t = target.getPose();
+//   return  polygon.containsPoint( QPointF(t.x(), t.z() ), Qt::WindingFill )
+}
+
+
+bool SpecificWorker::obstacle(RoboCompLaser::TLaserData ldata){
+  if(ldata[30].dist > threshold || ldata[70].dist > threshold)
+    return true;
+}
+
+/**Checks it there is an obstacle after turning, taking into account the direction of the last turn **/
+bool SpecificWorker::checkIfStillObstacle(RoboCompLaser::TLaserData ldata){ 
+  if(turnDirection == Turn::RIGHT && ldata[30].dist > threshold)
+    return false;
+  if(turnDirection == Turn::LEFT && ldata[70].dist > threshold)
+    return false;
+  return true;
+}
+
+/*Devides the better turn, checking where there is "more" obstacle, on the left or on the right (Preference = left)*/
+void SpecificWorker::decideTurnDirection(RoboCompLaser::TLaserData ldata)
+{
+  if(ldata[70].dist < threshold)/*Obstacle on the right (or in the right and in the left) (looking straight at it)*/
+    turnDirection == Turn::LEFT;
+  else /*If the obstacle is detected by the left part of the laser, we have to turn right*/
+    turnDirection == Turn::RIGHT;
 }
 
 void SpecificWorker::printState(float d, float adv, float rot){
@@ -141,7 +184,6 @@ float SpecificWorker::getGauss(float Vr, float Vx, float h){
 }
 
 float SpecificWorker::getSigmoid(float distance){
-  //float x = (1/1+pow(EulerConstant, -(distance/500))) -0.5;
   float x = distance / 100;  //In sigmoid function, the changes on the curve are around 1-2-3 in the X
   return x / (1 + abs(x)); //"fast" sigmoid function
   

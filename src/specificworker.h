@@ -47,14 +47,19 @@ public:
 	void turnState (RoboCompLaser::TLaserData ldata); // TURN state from Satate machine
 	void avoidState (RoboCompLaser::TLaserData ldata); // AVOID state from Satate machine
 	void endState (); // END state from Satate machine
-	int decideTurn(RoboCompLaser::TLaserData ldata);
+	bool targetAtSight(RoboCompLaser::TLaserData ldata);
+	bool obstacle(RoboCompLaser::TLaserData ldata);
+ 	bool checkIfStillObstacle(RoboCompLaser::TLaserData ldata);
+	void decideTurnDirection(RoboCompLaser::TLaserData ldata);
 	void printState(float d, float adv, float rot);
 	void setPick(const RoboCompRCISMousePicker::Pick& pick);
 	bool setParams(RoboCompCommonBehavior::ParameterList params);
 	float getGauss(float Vr, float Vx, float h);
 	float getSigmoid(float distance);
 	enum State {IDLE, GOTO, TURN, AVOID, END};
+	enum Turn {NONE, LEFT, RIGHT};
 	State robotState = State::IDLE;
+	Turn turnDirection = Turn::NONE;
 
 
 public slots:
