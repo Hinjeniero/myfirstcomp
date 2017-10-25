@@ -6,35 +6,7 @@
 
 #IncludeRegexTransform: 
 
-/home/ronniejd/robocomp/classes/qlog/qlog.cpp
-qlog.h
-/home/ronniejd/robocomp/classes/qlog/qlog.h
-
-/home/ronniejd/robocomp/classes/qlog/qlog.h
-config.h
-/home/ronniejd/robocomp/classes/qlog/config.h
-QtCore
--
-iostream
--
-Logger.h
--
-
-/home/ronniejd/robocomp/classes/rapplication/rapplication.cpp
-rapplication.h
-/home/ronniejd/robocomp/classes/rapplication/rapplication.h
-
-/home/ronniejd/robocomp/classes/rapplication/rapplication.h
-Ice/Ice.h
--
-Ice/Application.h
--
-IceUtil/IceUtil.h
--
-QtCore
--
-
-/home/ronniejd/robocomp/myfirstcomp/src/CommonBehavior.cpp
+/home/salabeta/myfirstcomp/src/CommonBehavior.cpp
 CommonBehavior.h
 -
 Ice/LocalException.h
@@ -48,7 +20,7 @@ Ice/Object.h
 IceUtil/Iterator.h
 -
 
-/home/ronniejd/robocomp/myfirstcomp/src/DifferentialRobot.cpp
+/home/salabeta/myfirstcomp/src/DifferentialRobot.cpp
 DifferentialRobot.h
 -
 Ice/LocalException.h
@@ -62,7 +34,7 @@ Ice/Object.h
 IceUtil/Iterator.h
 -
 
-/home/ronniejd/robocomp/myfirstcomp/src/Laser.cpp
+/home/salabeta/myfirstcomp/src/Laser.cpp
 Laser.h
 -
 Ice/LocalException.h
@@ -76,7 +48,7 @@ Ice/Object.h
 IceUtil/Iterator.h
 -
 
-/home/ronniejd/robocomp/myfirstcomp/src/RCISMousePicker.cpp
+/home/salabeta/myfirstcomp/src/RCISMousePicker.cpp
 RCISMousePicker.h
 -
 Ice/LocalException.h
@@ -90,11 +62,11 @@ Ice/Object.h
 IceUtil/Iterator.h
 -
 
-/home/ronniejd/robocomp/myfirstcomp/src/commonbehaviorI.cpp
+/home/salabeta/myfirstcomp/src/commonbehaviorI.cpp
 commonbehaviorI.h
-/home/ronniejd/robocomp/myfirstcomp/src/commonbehaviorI.h
+/home/salabeta/myfirstcomp/src/commonbehaviorI.h
 
-/home/ronniejd/robocomp/myfirstcomp/src/commonbehaviorI.h
+/home/salabeta/myfirstcomp/src/commonbehaviorI.h
 QtCore/QObject
 -
 Ice/Ice.h
@@ -104,37 +76,37 @@ CommonBehavior.h
 config.h
 -
 genericworker.h
-/home/ronniejd/robocomp/myfirstcomp/src/genericworker.h
+/home/salabeta/myfirstcomp/src/genericworker.h
 genericmonitor.h
-/home/ronniejd/robocomp/myfirstcomp/src/genericmonitor.h
+/home/salabeta/myfirstcomp/src/genericmonitor.h
 
-/home/ronniejd/robocomp/myfirstcomp/src/config.h
+/home/salabeta/myfirstcomp/src/config.h
 
-/home/ronniejd/robocomp/myfirstcomp/src/genericmonitor.cpp
+/home/salabeta/myfirstcomp/src/genericmonitor.cpp
 genericmonitor.h
-/home/ronniejd/robocomp/myfirstcomp/src/genericmonitor.h
+/home/salabeta/myfirstcomp/src/genericmonitor.h
 
-/home/ronniejd/robocomp/myfirstcomp/src/genericmonitor.h
+/home/salabeta/myfirstcomp/src/genericmonitor.h
 Ice/Ice.h
 -
 QtCore
 -
 genericworker.h
-/home/ronniejd/robocomp/myfirstcomp/src/genericworker.h
+/home/salabeta/myfirstcomp/src/genericworker.h
 config.h
-/home/ronniejd/robocomp/myfirstcomp/src/config.h
+/home/salabeta/myfirstcomp/src/config.h
 qlog/qlog.h
 -
 CommonBehavior.h
 -
 
-/home/ronniejd/robocomp/myfirstcomp/src/genericworker.cpp
+/home/salabeta/myfirstcomp/src/genericworker.cpp
 genericworker.h
-/home/ronniejd/robocomp/myfirstcomp/src/genericworker.h
+/home/salabeta/myfirstcomp/src/genericworker.h
 
-/home/ronniejd/robocomp/myfirstcomp/src/genericworker.h
+/home/salabeta/myfirstcomp/src/genericworker.h
 config.h
-/home/ronniejd/robocomp/myfirstcomp/src/config.h
+/home/salabeta/myfirstcomp/src/config.h
 QtGui
 -
 stdint.h
@@ -152,7 +124,7 @@ RCISMousePicker.h
 DifferentialRobot.h
 -
 
-/home/ronniejd/robocomp/myfirstcomp/src/main.cpp
+/home/salabeta/myfirstcomp/src/main.cpp
 signal.h
 -
 QtCore
@@ -170,17 +142,17 @@ rapplication/rapplication.h
 qlog/qlog.h
 -
 config.h
-/home/ronniejd/robocomp/myfirstcomp/src/config.h
+/home/salabeta/myfirstcomp/src/config.h
 genericmonitor.h
-/home/ronniejd/robocomp/myfirstcomp/src/genericmonitor.h
+/home/salabeta/myfirstcomp/src/genericmonitor.h
 genericworker.h
-/home/ronniejd/robocomp/myfirstcomp/src/genericworker.h
+/home/salabeta/myfirstcomp/src/genericworker.h
 specificworker.h
-/home/ronniejd/robocomp/myfirstcomp/src/specificworker.h
+/home/salabeta/myfirstcomp/src/specificworker.h
 specificmonitor.h
-/home/ronniejd/robocomp/myfirstcomp/src/specificmonitor.h
+/home/salabeta/myfirstcomp/src/specificmonitor.h
 commonbehaviorI.h
-/home/ronniejd/robocomp/myfirstcomp/src/commonbehaviorI.h
+/home/salabeta/myfirstcomp/src/commonbehaviorI.h
 rcismousepickerI.h
 -
 DifferentialRobot.h
@@ -190,49 +162,49 @@ Laser.h
 RCISMousePicker.h
 -
 
-/home/ronniejd/robocomp/myfirstcomp/src/moc_commonbehaviorI.cpp
+/home/salabeta/myfirstcomp/src/moc_commonbehaviorI.cpp
 commonbehaviorI.h
-/home/ronniejd/robocomp/myfirstcomp/src/commonbehaviorI.h
+/home/salabeta/myfirstcomp/src/commonbehaviorI.h
 
-/home/ronniejd/robocomp/myfirstcomp/src/moc_genericmonitor.cpp
+/home/salabeta/myfirstcomp/src/moc_genericmonitor.cpp
 genericmonitor.h
-/home/ronniejd/robocomp/myfirstcomp/src/genericmonitor.h
+/home/salabeta/myfirstcomp/src/genericmonitor.h
 
-/home/ronniejd/robocomp/myfirstcomp/src/moc_genericworker.cpp
+/home/salabeta/myfirstcomp/src/moc_genericworker.cpp
 genericworker.h
-/home/ronniejd/robocomp/myfirstcomp/src/genericworker.h
+/home/salabeta/myfirstcomp/src/genericworker.h
 
-/home/ronniejd/robocomp/myfirstcomp/src/moc_rcismousepickerI.cpp
+/home/salabeta/myfirstcomp/src/moc_rcismousepickerI.cpp
 rcismousepickerI.h
-/home/ronniejd/robocomp/myfirstcomp/src/rcismousepickerI.h
+/home/salabeta/myfirstcomp/src/rcismousepickerI.h
 
-/home/ronniejd/robocomp/myfirstcomp/src/moc_specificmonitor.cpp
+/home/salabeta/myfirstcomp/src/moc_specificmonitor.cpp
 specificmonitor.h
-/home/ronniejd/robocomp/myfirstcomp/src/specificmonitor.h
+/home/salabeta/myfirstcomp/src/specificmonitor.h
 
-/home/ronniejd/robocomp/myfirstcomp/src/moc_specificworker.cpp
+/home/salabeta/myfirstcomp/src/moc_specificworker.cpp
 specificworker.h
-/home/ronniejd/robocomp/myfirstcomp/src/specificworker.h
+/home/salabeta/myfirstcomp/src/specificworker.h
 
-/home/ronniejd/robocomp/myfirstcomp/src/myfirstcomp_automoc.cpp
+/home/salabeta/myfirstcomp/src/myfirstcomp_automoc.cpp
 moc_commonbehaviorI.cpp
-/home/ronniejd/robocomp/myfirstcomp/src/moc_commonbehaviorI.cpp
+/home/salabeta/myfirstcomp/src/moc_commonbehaviorI.cpp
 moc_genericmonitor.cpp
-/home/ronniejd/robocomp/myfirstcomp/src/moc_genericmonitor.cpp
+/home/salabeta/myfirstcomp/src/moc_genericmonitor.cpp
 moc_genericworker.cpp
-/home/ronniejd/robocomp/myfirstcomp/src/moc_genericworker.cpp
+/home/salabeta/myfirstcomp/src/moc_genericworker.cpp
 moc_rcismousepickerI.cpp
-/home/ronniejd/robocomp/myfirstcomp/src/moc_rcismousepickerI.cpp
+/home/salabeta/myfirstcomp/src/moc_rcismousepickerI.cpp
 moc_specificmonitor.cpp
-/home/ronniejd/robocomp/myfirstcomp/src/moc_specificmonitor.cpp
+/home/salabeta/myfirstcomp/src/moc_specificmonitor.cpp
 moc_specificworker.cpp
-/home/ronniejd/robocomp/myfirstcomp/src/moc_specificworker.cpp
+/home/salabeta/myfirstcomp/src/moc_specificworker.cpp
 
-/home/ronniejd/robocomp/myfirstcomp/src/rcismousepickerI.cpp
+/home/salabeta/myfirstcomp/src/rcismousepickerI.cpp
 rcismousepickerI.h
-/home/ronniejd/robocomp/myfirstcomp/src/rcismousepickerI.h
+/home/salabeta/myfirstcomp/src/rcismousepickerI.h
 
-/home/ronniejd/robocomp/myfirstcomp/src/rcismousepickerI.h
+/home/salabeta/myfirstcomp/src/rcismousepickerI.h
 QtCore/QObject
 -
 Ice/Ice.h
@@ -242,24 +214,54 @@ RCISMousePicker.h
 config.h
 -
 genericworker.h
-/home/ronniejd/robocomp/myfirstcomp/src/genericworker.h
+/home/salabeta/myfirstcomp/src/genericworker.h
 
-/home/ronniejd/robocomp/myfirstcomp/src/specificmonitor.cpp
+/home/salabeta/myfirstcomp/src/specificmonitor.cpp
 specificmonitor.h
-/home/ronniejd/robocomp/myfirstcomp/src/specificmonitor.h
+/home/salabeta/myfirstcomp/src/specificmonitor.h
 
-/home/ronniejd/robocomp/myfirstcomp/src/specificmonitor.h
+/home/salabeta/myfirstcomp/src/specificmonitor.h
 genericmonitor.h
-/home/ronniejd/robocomp/myfirstcomp/src/genericmonitor.h
+/home/salabeta/myfirstcomp/src/genericmonitor.h
 
-/home/ronniejd/robocomp/myfirstcomp/src/specificworker.cpp
+/home/salabeta/myfirstcomp/src/specificworker.cpp
+stdio.h
+-
 specificworker.h
-/home/ronniejd/robocomp/myfirstcomp/src/specificworker.h
+/home/salabeta/myfirstcomp/src/specificworker.h
 
-/home/ronniejd/robocomp/myfirstcomp/src/specificworker.h
+/home/salabeta/myfirstcomp/src/specificworker.h
 genericworker.h
 -
 innermodel/innermodel.h
+-
+
+/home/salabeta/robocomp/classes/qlog/qlog.cpp
+qlog.h
+/home/salabeta/robocomp/classes/qlog/qlog.h
+
+/home/salabeta/robocomp/classes/qlog/qlog.h
+config.h
+/home/salabeta/robocomp/classes/qlog/config.h
+QtCore
+-
+iostream
+-
+Logger.h
+-
+
+/home/salabeta/robocomp/classes/rapplication/rapplication.cpp
+rapplication.h
+/home/salabeta/robocomp/classes/rapplication/rapplication.h
+
+/home/salabeta/robocomp/classes/rapplication/rapplication.h
+Ice/Ice.h
+-
+Ice/Application.h
+-
+IceUtil/IceUtil.h
+-
+QtCore
 -
 
 /opt/robocomp/include/innermodel/innermodel.h

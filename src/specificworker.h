@@ -34,6 +34,10 @@
 #define MAXROT 1
 #define MINDISTANCE 50
 #define threshold 300
+#define leftAngle 20 //40º position of the index
+#define middleAngle 50
+#define rightAngle 80
+
 
 class SpecificWorker : public GenericWorker
 {
@@ -48,10 +52,13 @@ public:
 	void avoidState (RoboCompLaser::TLaserData ldata); // AVOID state from Satate machine
 	void endState (); // END state from Satate machine
 	bool targetAtSight(RoboCompLaser::TLaserData ldata);
+	bool cutVector(RoboCompLaser::TLaserData ldata);
 	bool obstacle(RoboCompLaser::TLaserData ldata);
- 	bool checkIfStillObstacle(RoboCompLaser::TLaserData ldata);
+ 	bool endTurnState(RoboCompLaser::TLaserData ldata);
+	bool checkIfStillObstacle(RoboCompLaser::TLaserData ldata);
 	void decideTurnDirection(RoboCompLaser::TLaserData ldata);
 	void printState(float d, float adv, float rot);
+	void printLaser(RoboCompLaser::TLaserData ldata, int start, int end);
 	void setPick(const RoboCompRCISMousePicker::Pick& pick);
 	bool setParams(RoboCompCommonBehavior::ParameterList params);
 	float getGauss(float Vr, float Vx, float h);

@@ -16,6 +16,7 @@
  *    You should have received a copy of the GNU General Public License
  *    along with RoboComp.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <stdio.h>
 #include "specificworker.h"
 
 /**
@@ -70,13 +71,14 @@ void SpecificWorker::compute(){
   }
 }
 	  
-void SpecificWorker::idleState(){
+void SpecificWorker::idleState(){ 
   if (!target.isEmpty())
     robotState = State::GOTO;
   differentialrobot_proxy->setSpeedBase(0, 0);
   
 }
 void SpecificWorker::gotoState(RoboCompLaser::TLaserData ldata) {
+  std::cout << "GOTO STATE!" << endl;  
   if(obstacle(ldata)){ /*Obstacle detected, left and right side*/
    differentialrobot_proxy->setSpeedBase(0, 0);
    robotState = State::TURN;
@@ -103,69 +105,107 @@ void SpecificWorker::gotoState(RoboCompLaser::TLaserData ldata) {
     float rot = atan2(tR.x(), tR.z());
     if (rot > MAXROT) rot = MAXROT;
     adv = MAXVEL * getSigmoid(d) * getGauss(rot, 0.3, 0.5);
-    printState(d, adv, rot); //TODO this will be deleted
+    //printState(d, adv, rot);
     differentialrobot_proxy->setSpeedBase(adv, rot);
   }
 }
 
 void SpecificWorker::turnState (RoboCompLaser::TLaserData ldata) {
-  if(!checkIfStillObstacle(ldata)){ /*Obstacle sorting, checks if there is still an obstacle*/
+  std::cout << "TURN STATE!" << endl;  
+  if(endTurnState(ldata)){ /*Obstacle sorting, checks if there is still an obstacle*/
     differentialrobot_proxy->setSpeedBase(0, 0);
-    std::cout << "Changing to State AVOID"<< endl;
     robotState = State::AVOID;
     return;
   }
-  if(turnDirection == Turn::LEFT)
-    differentialrobot_proxy->setSpeedBase(0, -1);      
-  else
-    differentialrobot_proxy->setSpeedBase(0, 1); 
+  if(turnDirection == Turn::LEFT){
+    differentialrobot_proxy->setSpeedBase(0, -1);
+    return;}
+  differentialrobot_proxy->setSpeedBase(0, 1); 
 }
 
 void SpecificWorker::avoidState (RoboCompLaser::TLaserData ldata){
-  std::cout << "AVOID STATE!" << endl;
-  
-  if(targetAtSight(ldata) || cutVector) //TODO the two methods, implement them 
-    robotState = State::GOTO;
+  std::cout << "AVOID STATE!" << endl;  
+//   if(targetAtSight(ldata) || cutVector(ldata)){
+//     robotState = State::GOTO;
+//     return;
+//   }
+  if(!checkIfStillObstacle(ldata)){
+    if(turnDirection == Turn::RIGHT){
+      differentialrobot_proxy->setSpeedBase(200, -1);
+      turnDirection = Turn::LEFT;
+      return;
+    }
+    differentialrobot_proxy->setSpeedBase(200, 1);
+    turnDirection = Turn::RIGHT;
+    return;
+  }
+  differentialrobot_proxy->setSpeedBase(200, 0);
 }
+
 void SpecificWorker::endState(){
   std::cout << "END STATE!" << endl;
   robotState = State::IDLE;
 }
 
-bool SpecificWorker::targetAtSight(RoboCompLaser::TLaserData ldata) /*TODO fix copy-paste*/
+bool SpecificWorker::targetAtSight(RoboCompLaser::TLaserData ldata)
 {
-//   QPolygonF polygon;
-//   for (auto l, lasercopy)
-//   {
-//     QVec lr = innermodel->laserTo("world", "laser", l.dist, l.angle)
-//     polygon << QPointF(lr.x(), lr.z());
-//   }
-//   QVec t = target.getPose();
-//   return  polygon.containsPoint( QPointF(t.x(), t.z() ), Qt::WindingFill )
+   QPolygonF polygon;
+   QVec r = inner->transform("world", "base");
+   polygon << QPointF(r.x(), r.z());
+   for (int i = 0; i < 100; i++ ){
+     QVec lr = inner->laserTo("world", "laser", ldata[i].dist, ldata[i].angle);
+     polygon << QPointF(lr.x(), lr.z());
+   }
+   polygon << QPointF(r.x(), r.z());
+   QPointF p(target.getTarget().first, target.getTarget().second);   
+   return  polygon.containsPoint( p , Qt::WindingFill );
 }
 
+bool SpecificWorker::cutVector ( RoboCompLaser::TLaserData ldata ) { 
+  return false;
+}
 
 bool SpecificWorker::obstacle(RoboCompLaser::TLaserData ldata){
-  if(ldata[30].dist > threshold || ldata[70].dist > threshold)
-    return true;
+  for(int i=leftAngle; i<= rightAngle; i++){
+    if(ldata[i].dist < threshold)
+      return true;
+  }
+  
+  return false;
+}
+
+/**Checks it there is an obstacle after turning, taking into account the direction of the last turn **/
+bool SpecificWorker::endTurnState(RoboCompLaser::TLaserData ldata){ 
+  int start = middleAngle;
+  int end = rightAngle;
+  if(turnDirection == Turn::RIGHT){  
+    start = leftAngle;
+    end = middleAngle; 
+  }
+  for (int i = start; i<= end; i++){
+    if(ldata[i].dist < threshold)
+      return false;
+  }
+  return true;
 }
 
 /**Checks it there is an obstacle after turning, taking into account the direction of the last turn **/
 bool SpecificWorker::checkIfStillObstacle(RoboCompLaser::TLaserData ldata){ 
-  if(turnDirection == Turn::RIGHT && ldata[30].dist > threshold)
-    return false;
-  if(turnDirection == Turn::LEFT && ldata[70].dist > threshold)
+  if((turnDirection == Turn::RIGHT && ldata[10].dist > threshold) || (turnDirection == Turn::LEFT && ldata[90].dist > threshold))
     return false;
   return true;
 }
 
+
+
 /*Devides the better turn, checking where there is "more" obstacle, on the left or on the right (Preference = left)*/
 void SpecificWorker::decideTurnDirection(RoboCompLaser::TLaserData ldata)
 {
-  if(ldata[70].dist < threshold)/*Obstacle on the right (or in the right and in the left) (looking straight at it)*/
-    turnDirection == Turn::LEFT;
-  else /*If the obstacle is detected by the left part of the laser, we have to turn right*/
-    turnDirection == Turn::RIGHT;
+  if(ldata[rightAngle].dist < threshold){/*Obstacle on the right (or in the right and in the left) (looking straight at it)*/
+    turnDirection = Turn::LEFT;
+    return;}
+  /*If the obstacle is detected by the left part of the laser, we have to turn right*/
+  turnDirection = Turn::RIGHT;
 }
 
 void SpecificWorker::printState(float d, float adv, float rot){
@@ -177,6 +217,12 @@ void SpecificWorker::printState(float d, float adv, float rot){
   std::cout << "Distance is - " << d << endl;
   std::cout << "-------------------------"<< endl;
 }
+
+void SpecificWorker::printLaser(RoboCompLaser::TLaserData ldata, int start, int end){
+  for(int i=start; i<=end; i++)
+    std::cout << "Laser position " << i << " distance -> " << ldata[i].dist << endl;
+}
+
 
 float SpecificWorker::getGauss(float Vr, float Vx, float h){
   float lambda = -pow(Vx, 2)/log(h);
@@ -208,17 +254,16 @@ void SpecificWorker::setPick(const RoboCompRCISMousePicker::Pick& pick)
  		//differentialrobot_proxy->setSpeedBase(10, rot);
 		differentialrobot_proxy->setSpeedBase(0, 1);
 		usleep(rand()%(1500000-100000 + 1) + 100000);  //random wait between 1.5s and 0.1sec
-	}*/
+	}
 
-
-
-// 	try
-// 	{
-// 		camera_proxy->getYImage(0,img, cState, bState);
-// 		memcpy(image_gray.data, &img[0], m_width*m_height*sizeof(uchar));
-// 		searchTags(image_gray);
-// 	}
-// 	catch(const Ice::Exception &e)
-// 	{
-// 		std::cout << "Error reading from Camera" << e << std::endl;
-// 	}
+	try
+	{
+		camera_proxy->getYImage(0,img, cState, bState);
+		memcpy(image_gray.data, &img[0], m_width*m_height*sizeof(uchar));
+		searchTags(image_gray);
+	}
+	catch(const Ice::Exception &e)
+	{
+		std::cout << "Error reading from Camera" << e << std::endl;
+	}
+*/
