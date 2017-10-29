@@ -30,16 +30,16 @@
 #include <genericworker.h>
 #include <innermodel/innermodel.h>
 
-#define MAXVEL 400
-#define MAXROT 1
-#define MINDISTANCE 50
-#define threshold 300
-#define leftMaxAngle 10
-#define leftAngle 30 //40º position of the index
+#define MAXVEL 400 //Max advancing speed
+#define MAXROT 1 //Max rotation speed
+#define MINDISTANCE 50 //Distance to the target needed to arrive at it.
+#define threshold 300 //Minimal distance to an obstacle before action
+#define leftMaxAngle 10 //First valid position of the laser
+#define leftAngle 25 //25º position of the index
 #define middleAngle 50
-#define rightAngle 70
-#define rightMaxAngle 90
-#define marginError 100
+#define rightAngle 75
+#define rightMaxAngle 90 //Last valid position of the laser
+#define marginError 100 //Margin error of the vectorContainsPoint
 
 class SpecificWorker : public GenericWorker
 {
@@ -47,28 +47,49 @@ Q_OBJECT
 public:
 	SpecificWorker(MapPrx& mprx);	
 	~SpecificWorker();
+	/*Constant containing the euler constant (e number)*/
 	const float EulerConstant = std::exp(1.0);
-	void idleState(); // IDLE state from Satate machine
-	void gotoState(RoboCompLaser::TLaserData ldata); // GOTO state from Satate machine
-	void turnState (RoboCompLaser::TLaserData ldata); // TURN state from Satate machine
-	void avoidState (RoboCompLaser::TLaserData ldata); // AVOID state from Satate machine
-	void endState (); // END state from Satate machine
-	bool targetAtSight(RoboCompLaser::TLaserData ldata);
-	bool vectorContainsPoint (std::pair <float, float> point) ;
-	bool obstacle(RoboCompLaser::TLaserData ldata);
- 	bool endTurnState(RoboCompLaser::TLaserData ldata);
-	bool checkIfStillObstacle(RoboCompLaser::TLaserData ldata);
-	void decideTurnDirection(RoboCompLaser::TLaserData ldata);
-	void printState(float d, float adv, float rot);
-	void printLaser(RoboCompLaser::TLaserData ldata, int start, int end);
-	void setPick(const RoboCompRCISMousePicker::Pick& pick);
+	/*Set the initial params of the world, including the world's path*/
 	bool setParams(RoboCompCommonBehavior::ParameterList params);
+	/*Working method of the idle State (Only waiting for a target)*/
+	void idleState();
+	/*GOTO State -> Going to a target*/
+	void gotoState(RoboCompLaser::TLaserData ldata); 
+	/*TURN State -> Turning until the encountered obstacle is no more at sight*/
+	void turnState (RoboCompLaser::TLaserData ldata);
+	/*Checks the laser and returns TRUE when the turn is enough to not bump into the obstacle*/
+	bool endTurnState(RoboCompLaser::TLaserData ldata);
+	/*AVOID State -> Follow the obstacle's border until it sees the target or pass over the vector of GOTO*/
+	void avoidState (RoboCompLaser::TLaserData ldata); 
+	/*Returns TRUE if the target is within the robot's laser (ldata). FALSE otherwise*/
+	bool targetAtSight(RoboCompLaser::TLaserData ldata);
+	/*Returns TRUE if the robot's present position is near (Using a margin error) of the GOTO vector*/
+	bool vectorContainsPoint (std::pair <float, float> point);
+	/*END State -> Last state between GOTO and IDLE. Does nothing atm*/
+	void endState ();
+	/*Returns TRUE if there is an obstacle in the laser data at a distance lower than a threshold*/
+	bool obstacle(RoboCompLaser::TLaserData ldata);
+	/*Decides the turn direction, thinking in which one it would have to turn the less*/
+	void decideTurnDirection(RoboCompLaser::TLaserData ldata);
+	/*Print parameters of the GOTO state->Sigmoid value, gaussian value, rot and adv...*/
+	void printState(float d, float adv, float rot);
+	/*Print the laser's array values between start and end positions*/
+	void printLaser(RoboCompLaser::TLaserData ldata, int start, int end);
+	/*Set a target according to the pick that the user did with the mouse*/
+	void setPick(const RoboCompRCISMousePicker::Pick& pick);
+	/*Gauss function*/
 	float getGauss(float Vr, float Vx, float h);
+	/*Sigmoid function*/
 	float getSigmoid(float distance);
+	/*State machine enum*/
 	enum State {IDLE, GOTO, TURN, AVOID, END};
+	/*Turn direction enum*/
 	enum Turn {NONE, LEFT, RIGHT};
+	/*Present state of the robot*/
 	State robotState = State::IDLE;
+	/*Last turn direction that the robot did*/
 	Turn turnDirection = Turn::NONE;
+	/*Where was the last wall (To wall follow, bug method)*/
 	Turn lastWall = Turn::NONE;
 
 

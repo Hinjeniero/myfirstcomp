@@ -72,9 +72,12 @@ void SpecificWorker::compute(){
 }
 	  
 void SpecificWorker::idleState(){ 
-  if (!target.isEmpty())
-    target.setRobotPos();//TODO Need to set the robot location in the world's pov!!
+  if (!target.isEmpty()){
+    RoboCompDifferentialRobot::TBaseState state;
+    differentialrobot_proxy->getBaseState(state);
+    target.setRobotPos(state.x, state.z);
     robotState = State::GOTO;
+  }
   differentialrobot_proxy->setSpeedBase(0, 0);
   
 }
@@ -98,17 +101,16 @@ void SpecificWorker::gotoState(RoboCompLaser::TLaserData ldata) {
   if(d < MINDISTANCE){
     robotState = State::IDLE;
     target.setEmpty();
-    std::cout << "The bomb has been planted." <<endl;
+    std::cout << "Arrived at target." <<endl;
     return;
-  }else{
-    /*We do continue on the GOTO state*/
-    float adv;
-    float rot = atan2(tR.x(), tR.z());
-    if (rot > MAXROT) rot = MAXROT;
-    adv = MAXVEL * getSigmoid(d) * getGauss(rot, 0.3, 0.5);
-    //printState(d, adv, rot);
-    differentialrobot_proxy->setSpeedBase(adv, rot);
   }
+  /*We do continue on the GOTO state*/
+  float adv;
+  float rot = atan2(tR.x(), tR.z());
+  if (rot > MAXROT) rot = MAXROT;
+  adv = MAXVEL * getSigmoid(d) * getGauss(rot, 0.3, 0.5);
+  //printState(d, adv, rot);
+  differentialrobot_proxy->setSpeedBase(adv, rot);
 }
 
 void SpecificWorker::turnState (RoboCompLaser::TLaserData ldata) {
@@ -125,12 +127,29 @@ void SpecificWorker::turnState (RoboCompLaser::TLaserData ldata) {
   differentialrobot_proxy->setSpeedBase(0, 1); 
 }
 
+/**Checks it there is an obstacle after turning, taking into account the direction of the last turn **/
+bool SpecificWorker::endTurnState(RoboCompLaser::TLaserData ldata){ 
+  int start = middleAngle;
+  int end = rightAngle;
+  if(turnDirection == Turn::RIGHT){  
+    start = leftAngle;
+    end = middleAngle; 
+  }
+  for (int i = start; i<= end; i++){
+    if(ldata[i].dist < threshold)
+      return false;
+  }
+  return true;
+}
+
 void SpecificWorker::avoidState (RoboCompLaser::TLaserData ldata){
   std::cout << "AVOID STATE!" << endl;  
-//   if(targetAtSight(ldata) || cutVector(ldata)){
-//     robotState = State::GOTO;
-//     return;
-//   }
+  RoboCompDifferentialRobot::TBaseState state;
+  differentialrobot_proxy->getBaseState(state);
+  if(targetAtSight(ldata) || vectorContainsPoint(std::pair <float, float>(state.x, state.z))){
+    robotState = State::GOTO;
+    return;
+  }
   if(obstacle(ldata)){
     if(lastWall == Turn::RIGHT){
       differentialrobot_proxy->setSpeedBase(200, -0.5);
@@ -141,7 +160,7 @@ void SpecificWorker::avoidState (RoboCompLaser::TLaserData ldata){
     turnDirection = Turn::RIGHT;
     return;
   }
-  if(!checkIfStillObstacle(ldata)){
+  if((lastWall == Turn::RIGHT && ldata[leftMaxAngle].dist > threshold) || (lastWall == Turn::LEFT && ldata[rightMaxAngle].dist > threshold)){
     if(lastWall == Turn::RIGHT){
       differentialrobot_proxy->setSpeedBase(200, 0.5);
       turnDirection = Turn::RIGHT;
@@ -152,11 +171,6 @@ void SpecificWorker::avoidState (RoboCompLaser::TLaserData ldata){
     return;
   }
   differentialrobot_proxy->setSpeedBase(200, 0); //else
-}
-
-void SpecificWorker::endState(){
-  std::cout << "END STATE!" << endl;
-  robotState = State::IDLE;
 }
 
 bool SpecificWorker::targetAtSight(RoboCompLaser::TLaserData ldata)
@@ -181,9 +195,13 @@ bool SpecificWorker::vectorContainsPoint (std::pair <float, float> point) {
   
   float x = end.second-start.second;
   float y = start.first - end.first;
-  float b = -((end.second-start.second)*(-start.first))+
-    ((start.first-end.first)*(-start.second));
+  float b = -(x*(-start.first))+(y*(-start.second));
   return x*point.first + y*point.second + b < marginError; //the point is in the neighborhood of the vector.
+}
+
+void SpecificWorker::endState(){
+  std::cout << "END STATE!" << endl;
+  robotState = State::IDLE;
 }
 
 bool SpecificWorker::obstacle(RoboCompLaser::TLaserData ldata){
@@ -191,35 +209,10 @@ bool SpecificWorker::obstacle(RoboCompLaser::TLaserData ldata){
     if(ldata[i].dist < threshold)
       return true;
   }
-  
   return false;
 }
 
-/**Checks it there is an obstacle after turning, taking into account the direction of the last turn **/
-bool SpecificWorker::endTurnState(RoboCompLaser::TLaserData ldata){ 
-  int start = middleAngle;
-  int end = rightAngle;
-  if(turnDirection == Turn::RIGHT){  
-    start = leftAngle;
-    end = middleAngle; 
-  }
-  for (int i = start; i<= end; i++){
-    if(ldata[i].dist < threshold)
-      return false;
-  }
-  return true;
-}
-
-/**Checks it there is an obstacle after turning, taking into account the direction of the last turn **/
-bool SpecificWorker::checkIfStillObstacle(RoboCompLaser::TLaserData ldata){ 
-  if((lastWall == Turn::RIGHT && ldata[leftMaxAngle].dist > threshold) || (lastWall == Turn::LEFT && ldata[rightMaxAngle].dist > threshold))
-    return false;
-  return true;
-}
-
-
-
-/*Devides the better turn, checking where there is "more" obstacle, on the left or on the right (Preference = left)*/
+/*Decides the better turn, checking where there is "more" obstacle, on the left or on the right (Preference = left)*/
 void SpecificWorker::decideTurnDirection(RoboCompLaser::TLaserData ldata)
 {
   if(ldata[rightAngle].dist < threshold){/*Obstacle on the right (or in the right and in the left) (looking straight at it)*/
