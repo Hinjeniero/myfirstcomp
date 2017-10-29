@@ -73,6 +73,7 @@ void SpecificWorker::compute(){
 	  
 void SpecificWorker::idleState(){ 
   if (!target.isEmpty())
+    target.setRobotPos();//TODO Need to set the robot location in the world's pov!!
     robotState = State::GOTO;
   differentialrobot_proxy->setSpeedBase(0, 0);
   
@@ -119,7 +120,8 @@ void SpecificWorker::turnState (RoboCompLaser::TLaserData ldata) {
   }
   if(turnDirection == Turn::LEFT){
     differentialrobot_proxy->setSpeedBase(0, -1);
-    return;}
+    return;
+  }
   differentialrobot_proxy->setSpeedBase(0, 1); 
 }
 
@@ -129,17 +131,27 @@ void SpecificWorker::avoidState (RoboCompLaser::TLaserData ldata){
 //     robotState = State::GOTO;
 //     return;
 //   }
-  if(!checkIfStillObstacle(ldata)){
-    if(turnDirection == Turn::RIGHT){
-      differentialrobot_proxy->setSpeedBase(200, -1);
+  if(obstacle(ldata)){
+    if(lastWall == Turn::RIGHT){
+      differentialrobot_proxy->setSpeedBase(200, -0.5);
       turnDirection = Turn::LEFT;
       return;
     }
-    differentialrobot_proxy->setSpeedBase(200, 1);
+    differentialrobot_proxy->setSpeedBase(200, 0.5);
     turnDirection = Turn::RIGHT;
     return;
   }
-  differentialrobot_proxy->setSpeedBase(200, 0);
+  if(!checkIfStillObstacle(ldata)){
+    if(lastWall == Turn::RIGHT){
+      differentialrobot_proxy->setSpeedBase(200, 0.5);
+      turnDirection = Turn::RIGHT;
+      return;
+    }
+    differentialrobot_proxy->setSpeedBase(200, -0.5);
+    turnDirection = Turn::LEFT;
+    return;
+  }
+  differentialrobot_proxy->setSpeedBase(200, 0); //else
 }
 
 void SpecificWorker::endState(){
@@ -161,8 +173,17 @@ bool SpecificWorker::targetAtSight(RoboCompLaser::TLaserData ldata)
    return  polygon.containsPoint( p , Qt::WindingFill );
 }
 
-bool SpecificWorker::cutVector ( RoboCompLaser::TLaserData ldata ) { 
-  return false;
+/*y = x1-x2 | x = y2-y1 | b = ((y2-y1)*-x1)+((x1-x2)*-y1)
+ Substitute point in mx + ny + b, and if it equals 0, it is in the slope*/
+bool SpecificWorker::vectorContainsPoint (std::pair <float, float> point) {
+  std::pair <float, float> end = target.getTarget();
+  std::pair <float, float> start = target.getRobotPos();
+  
+  float x = end.second-start.second;
+  float y = start.first - end.first;
+  float b = -((end.second-start.second)*(-start.first))+
+    ((start.first-end.first)*(-start.second));
+  return x*point.first + y*point.second + b < marginError; //the point is in the neighborhood of the vector.
 }
 
 bool SpecificWorker::obstacle(RoboCompLaser::TLaserData ldata){
@@ -191,7 +212,7 @@ bool SpecificWorker::endTurnState(RoboCompLaser::TLaserData ldata){
 
 /**Checks it there is an obstacle after turning, taking into account the direction of the last turn **/
 bool SpecificWorker::checkIfStillObstacle(RoboCompLaser::TLaserData ldata){ 
-  if((turnDirection == Turn::RIGHT && ldata[10].dist > threshold) || (turnDirection == Turn::LEFT && ldata[90].dist > threshold))
+  if((lastWall == Turn::RIGHT && ldata[leftMaxAngle].dist > threshold) || (lastWall == Turn::LEFT && ldata[rightMaxAngle].dist > threshold))
     return false;
   return true;
 }
@@ -203,9 +224,12 @@ void SpecificWorker::decideTurnDirection(RoboCompLaser::TLaserData ldata)
 {
   if(ldata[rightAngle].dist < threshold){/*Obstacle on the right (or in the right and in the left) (looking straight at it)*/
     turnDirection = Turn::LEFT;
-    return;}
+    lastWall = Turn::RIGHT;
+    return;
+  }
   /*If the obstacle is detected by the left part of the laser, we have to turn right*/
   turnDirection = Turn::RIGHT;
+  lastWall = Turn::LEFT;
 }
 
 void SpecificWorker::printState(float d, float adv, float rot){
@@ -238,6 +262,7 @@ float SpecificWorker::getSigmoid(float distance){
 void SpecificWorker::setPick(const RoboCompRCISMousePicker::Pick& pick)
 {
   target.setTarget(pick.x, pick.z);
+  robotState = State::IDLE;
   std::cout << "Location x -> " << pick.x << " was chosen." << endl;
   std::cout << "Location z -> " << pick.z << " was chosen." << endl; 
 }

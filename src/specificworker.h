@@ -34,10 +34,12 @@
 #define MAXROT 1
 #define MINDISTANCE 50
 #define threshold 300
-#define leftAngle 20 //40º position of the index
+#define leftMaxAngle 10
+#define leftAngle 30 //40º position of the index
 #define middleAngle 50
-#define rightAngle 80
-
+#define rightAngle 70
+#define rightMaxAngle 90
+#define marginError 100
 
 class SpecificWorker : public GenericWorker
 {
@@ -52,7 +54,7 @@ public:
 	void avoidState (RoboCompLaser::TLaserData ldata); // AVOID state from Satate machine
 	void endState (); // END state from Satate machine
 	bool targetAtSight(RoboCompLaser::TLaserData ldata);
-	bool cutVector(RoboCompLaser::TLaserData ldata);
+	bool vectorContainsPoint (std::pair <float, float> point) ;
 	bool obstacle(RoboCompLaser::TLaserData ldata);
  	bool endTurnState(RoboCompLaser::TLaserData ldata);
 	bool checkIfStillObstacle(RoboCompLaser::TLaserData ldata);
@@ -67,6 +69,7 @@ public:
 	enum Turn {NONE, LEFT, RIGHT};
 	State robotState = State::IDLE;
 	Turn turnDirection = Turn::NONE;
+	Turn lastWall = Turn::NONE;
 
 
 public slots:
@@ -79,6 +82,8 @@ private:
 	    bool empty = true;
 	    float x;
 	    float z;
+	    float robotX;
+	    float robotZ;
 	    QMutex mutex;
 	    bool isEmpty()
 	    {
@@ -102,6 +107,17 @@ private:
 	    {
 	      QMutexLocker ml(&mutex);
 	      return std::make_pair(x,z);
+	    };
+	    void setRobotPos(float robot_x, float robot_z)
+	    {
+	      QMutexLocker ml(&mutex);
+	      robotX = robot_x;
+	      robotZ = robot_z;
+	    };	
+	    std::pair<float, float> getRobotPos()
+	    {
+	      QMutexLocker ml(&mutex);
+	      return std::make_pair(robotX,robotZ);
 	    };
 	};
 	Target target;
