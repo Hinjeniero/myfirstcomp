@@ -82,8 +82,6 @@ void SpecificWorker::idleState(){
     target.setRobotPos(state.x, state.z);
     robotState = State::GOTO;
   }
-  differentialrobot_proxy->setSpeedBase(0, 0);
-  
 }
 void SpecificWorker::gotoState(RoboCompLaser::TLaserData ldata) {
   std::cout << "GOTO STATE!" << endl;  
@@ -145,12 +143,15 @@ bool SpecificWorker::endTurnState(RoboCompLaser::TLaserData ldata){
 
 void SpecificWorker::avoidState (RoboCompLaser::TLaserData ldata){
   std::cout << "AVOID STATE!" << endl;  
+    
   RoboCompDifferentialRobot::TBaseState state;
   differentialrobot_proxy->getBaseState(state);
-//   if(targetAtSight(ldata) || vectorContainsPoint(std::pair <float, float>(state.x, state.z))){
-//     robotState = State::GOTO;
-//     return;
-//   }
+
+ 
+  if( (targetAtSight(ldata) && !obstacle(ldata)) || (angleWithTarget() && !obstacle(ldata))){
+    robotState = State::GOTO;
+    return;
+  }
   if(obstacle(ldata)){
     if(lastWall == Turn::RIGHT){
       differentialrobot_proxy->setSpeedBase(200, -0.5);
@@ -179,16 +180,18 @@ bool SpecificWorker::targetAtSight(RoboCompLaser::TLaserData ldata)
    QPolygonF polygon;
    QVec r = inner->transform("world", "base");
    polygon << QPointF(r.x(), r.z());
-   for (int i = 0; i < 100; i++ ){
+   for (int i = 30; i < 70; i++ ){
      QVec lr = inner->laserTo("world", "laser", ldata[i].dist, ldata[i].angle);
      polygon << QPointF(lr.x(), lr.z());
    }
    polygon << QPointF(r.x(), r.z());
-   QPointF p(target.getTarget().first, target.getTarget().second);   
-   return  polygon.containsPoint( p , Qt::WindingFill );
+   QPointF p(target.getTarget().first, target.getTarget().second); 
+   if(polygon.containsPoint( p , Qt::WindingFill)) //TODO delete later!
+     std::cout << "targetAtSight activated!" << endl;
+   return  polygon.containsPoint( p , Qt::WindingFill );  
 }
 
-/*y = x1-x2 | x = y2-y1 | b = ((y2-y1)*-x1)+((x1-x2)*-y1)
+/*y = x1-x2 | x = y2-y1 | b = (x*-x1)+(y*-y1)
  Substitute point in mx + ny + b, and if it equals 0, it is in the slope*/
 bool SpecificWorker::vectorContainsPoint (std::pair <float, float> point) {
   std::pair <float, float> end = target.getTarget();
@@ -196,12 +199,23 @@ bool SpecificWorker::vectorContainsPoint (std::pair <float, float> point) {
   
   float x = end.second-start.second;
   float y = start.first - end.first;
-  float b = -(x*(-start.first))-(y*(-start.second));
+  float b = (-x*start.first)+(-y*start.second);
   return x*point.first + y*point.second + b < marginError; //the point is in the neighborhood of the vector.
+}
+
+bool SpecificWorker::angleWithTarget () {
+  std::pair<float, float> t = target.getTarget();
+  QVec tR = inner->transform("base", QVec::vec3(t.first, 0, t.second), "world");
+  std::cout << "ANGLE WITH TARGET " <<abs(atan2(tR.x(), tR.z())) <<endl; 
+  if (abs(atan2(tR.x(), tR.z())) < angleLimit){
+    std::cout << "anglewithtarget activated!" << endl;
+    return true;}//TODO delete later!
+  return false;
 }
 
 void SpecificWorker::endState(){
   std::cout << "END STATE!" << endl;
+  differentialrobot_proxy->setSpeedBase(0, 0);
   robotState = State::IDLE;
 }
 

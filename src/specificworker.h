@@ -40,6 +40,7 @@
 #define rightAngle 75
 #define rightMaxAngle 90 //Last valid position of the laser
 #define marginError 100 //Margin error of the vectorContainsPoint
+#define angleLimit 0.06//Angle which the robot has with the target. threshold
 
 class SpecificWorker : public GenericWorker
 {
@@ -65,6 +66,8 @@ public:
 	bool targetAtSight(RoboCompLaser::TLaserData ldata);
 	/*Returns TRUE if the robot's present position is near (Using a margin error) of the GOTO vector*/
 	bool vectorContainsPoint (std::pair <float, float> point);
+	/*Return True if the target is almost in front of the robot (low angle) (substitute of line's equation)*/
+	bool angleWithTarget ();
 	/*END State -> Last state between GOTO and IDLE. Does nothing atm*/
 	void endState ();
 	/*Returns TRUE if there is an obstacle in the laser data at a distance lower than a threshold*/
