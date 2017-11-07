@@ -46,6 +46,10 @@ void SpecificWorker::compute(){
   try
   {
       RoboCompLaser::TLaserData ldata = laser_proxy->getLaserData();
+      RoboCompDifferentialRobot::TBaseState state;
+      differentialrobot_proxy->getBaseState(state);
+      inner->updateTransformValues("base", state.x, 0, state.z, 0, state.alpha, 0); //Updates the transform values according to the robot's actual location	    
+
       //std::sort(ldata.begin(), ldata.end(), [](RoboCompLaser::TData a, RoboCompLaser::TData b){ return a.dist < b.dist; }) ;  //sort laser data from small to large distances using a lambda function.
       switch(robotState) {
 	case State::IDLE: 
@@ -91,9 +95,6 @@ void SpecificWorker::gotoState(RoboCompLaser::TLaserData ldata) {
   }
 
   //All variables are needed to calculate distance
-  RoboCompDifferentialRobot::TBaseState state;
-  differentialrobot_proxy->getBaseState(state);
-  inner->updateTransformValues("base", state.x, 0, state.z, 0, state.alpha, 0); //Transforms the robot's vector to the world's point of view. (Or vice versa, don't remember).	    
   std::pair<float, float> t = target.getTarget();
   QVec tR = inner->transform("base", QVec::vec3(t.first, 0, t.second), "world"); //Vector's source is robot's location, vector's end is the mouse pick
   float d = tR.norm2(); //Gets the distance, that equals the vector's module
@@ -146,10 +147,10 @@ void SpecificWorker::avoidState (RoboCompLaser::TLaserData ldata){
   std::cout << "AVOID STATE!" << endl;  
   RoboCompDifferentialRobot::TBaseState state;
   differentialrobot_proxy->getBaseState(state);
-  if(targetAtSight(ldata) || vectorContainsPoint(std::pair <float, float>(state.x, state.z))){
-    robotState = State::GOTO;
-    return;
-  }
+//   if(targetAtSight(ldata) || vectorContainsPoint(std::pair <float, float>(state.x, state.z))){
+//     robotState = State::GOTO;
+//     return;
+//   }
   if(obstacle(ldata)){
     if(lastWall == Turn::RIGHT){
       differentialrobot_proxy->setSpeedBase(200, -0.5);
@@ -195,7 +196,7 @@ bool SpecificWorker::vectorContainsPoint (std::pair <float, float> point) {
   
   float x = end.second-start.second;
   float y = start.first - end.first;
-  float b = -(x*(-start.first))+(y*(-start.second));
+  float b = -(x*(-start.first))-(y*(-start.second));
   return x*point.first + y*point.second + b < marginError; //the point is in the neighborhood of the vector.
 }
 
