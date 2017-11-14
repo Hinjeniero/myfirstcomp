@@ -6,15 +6,17 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_CHECK_CXX
   "/home/salabeta/myfirstcomp/src/CommonBehavior.cpp" "/home/salabeta/myfirstcomp/src/CMakeFiles/myfirstcomp.dir/CommonBehavior.cpp.o"
   "/home/salabeta/myfirstcomp/src/DifferentialRobot.cpp" "/home/salabeta/myfirstcomp/src/CMakeFiles/myfirstcomp.dir/DifferentialRobot.cpp.o"
+  "/home/salabeta/myfirstcomp/src/GotoPoint.cpp" "/home/salabeta/myfirstcomp/src/CMakeFiles/myfirstcomp.dir/GotoPoint.cpp.o"
   "/home/salabeta/myfirstcomp/src/Laser.cpp" "/home/salabeta/myfirstcomp/src/CMakeFiles/myfirstcomp.dir/Laser.cpp.o"
   "/home/salabeta/myfirstcomp/src/RCISMousePicker.cpp" "/home/salabeta/myfirstcomp/src/CMakeFiles/myfirstcomp.dir/RCISMousePicker.cpp.o"
   "/home/salabeta/myfirstcomp/src/commonbehaviorI.cpp" "/home/salabeta/myfirstcomp/src/CMakeFiles/myfirstcomp.dir/commonbehaviorI.cpp.o"
   "/home/salabeta/myfirstcomp/src/genericmonitor.cpp" "/home/salabeta/myfirstcomp/src/CMakeFiles/myfirstcomp.dir/genericmonitor.cpp.o"
   "/home/salabeta/myfirstcomp/src/genericworker.cpp" "/home/salabeta/myfirstcomp/src/CMakeFiles/myfirstcomp.dir/genericworker.cpp.o"
-  "/home/salabeta/robocomp/classes/qlog/qlog.cpp" "/home/salabeta/myfirstcomp/src/CMakeFiles/myfirstcomp.dir/home/salabeta/robocomp/classes/qlog/qlog.cpp.o"
-  "/home/salabeta/robocomp/classes/rapplication/rapplication.cpp" "/home/salabeta/myfirstcomp/src/CMakeFiles/myfirstcomp.dir/home/salabeta/robocomp/classes/rapplication/rapplication.cpp.o"
+  "/home/salabeta/myfirstcomp/src/gotopointI.cpp" "/home/salabeta/myfirstcomp/src/CMakeFiles/myfirstcomp.dir/gotopointI.cpp.o"
   "/home/salabeta/myfirstcomp/src/main.cpp" "/home/salabeta/myfirstcomp/src/CMakeFiles/myfirstcomp.dir/main.cpp.o"
   "/home/salabeta/myfirstcomp/src/myfirstcomp_automoc.cpp" "/home/salabeta/myfirstcomp/src/CMakeFiles/myfirstcomp.dir/myfirstcomp_automoc.cpp.o"
+  "/opt/robocomp/classes/qlog/qlog.cpp" "/home/salabeta/myfirstcomp/src/CMakeFiles/myfirstcomp.dir/opt/robocomp/classes/qlog/qlog.cpp.o"
+  "/opt/robocomp/classes/rapplication/rapplication.cpp" "/home/salabeta/myfirstcomp/src/CMakeFiles/myfirstcomp.dir/opt/robocomp/classes/rapplication/rapplication.cpp.o"
   "/home/salabeta/myfirstcomp/src/rcismousepickerI.cpp" "/home/salabeta/myfirstcomp/src/CMakeFiles/myfirstcomp.dir/rcismousepickerI.cpp.o"
   "/home/salabeta/myfirstcomp/src/specificmonitor.cpp" "/home/salabeta/myfirstcomp/src/CMakeFiles/myfirstcomp.dir/specificmonitor.cpp.o"
   "/home/salabeta/myfirstcomp/src/specificworker.cpp" "/home/salabeta/myfirstcomp/src/CMakeFiles/myfirstcomp.dir/specificworker.cpp.o"
@@ -43,9 +45,9 @@ set(CMAKE_CXX_TARGET_INCLUDE_PATH
   "/opt/robocomp/include"
   "/classes"
   "."
-  "/home/salabeta/robocomp/classes"
-  "/home/salabeta/robocomp/libs"
-  "/home/salabeta/robocomp/interfaces"
+  "/opt/robocomp/classes"
+  "/opt/robocomp/libs"
+  "/opt/robocomp/interfaces"
   "/include"
   )
 
@@ -53,6 +55,7 @@ set(CMAKE_CXX_TARGET_INCLUDE_PATH
 set(CMAKE_MULTIPLE_OUTPUT_PAIRS
   "/home/salabeta/myfirstcomp/src/CommonBehavior.h" "/home/salabeta/myfirstcomp/src/CommonBehavior.cpp"
   "/home/salabeta/myfirstcomp/src/DifferentialRobot.h" "/home/salabeta/myfirstcomp/src/DifferentialRobot.cpp"
+  "/home/salabeta/myfirstcomp/src/GotoPoint.h" "/home/salabeta/myfirstcomp/src/GotoPoint.cpp"
   "/home/salabeta/myfirstcomp/src/Laser.h" "/home/salabeta/myfirstcomp/src/Laser.cpp"
   "/home/salabeta/myfirstcomp/src/RCISMousePicker.h" "/home/salabeta/myfirstcomp/src/RCISMousePicker.cpp"
   )

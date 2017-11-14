@@ -94,7 +94,13 @@ public:
 	Turn turnDirection = Turn::NONE;
 	/*Where was the last wall (To wall follow, bug method)*/
 	Turn lastWall = Turn::NONE;
-
+	
+	/*Where was the last wall (To wall follow, bug method)*/
+	void go(const string &nodo, const float x, const float y, const float alpha);
+	void turn(const float speed);
+	bool atTarget();
+	void stop();
+	
 
 public slots:
 	void compute(); 	

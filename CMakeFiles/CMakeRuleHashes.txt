@@ -1,7 +1,8 @@
 # Hashes of file build rules.
 33a6737e69327b28faedda233ab56902 src/CMakeFiles/myfirstcomp_automoc
-4f6250c298c1077a3db1ad65161b869a src/CommonBehavior.cpp
-86bb2a4d993889d7fa6e8ec6f38d3500 src/DifferentialRobot.cpp
-817242637f4307c46856fae589a066ee src/Laser.cpp
-7e9339d31e4b30aefc0bc9fe6c83ca24 src/RCISMousePicker.cpp
+1979621f1c098b4c5eb841a031021cc3 src/CommonBehavior.cpp
+9bd0606945b6446caa8cfce72158a0a4 src/DifferentialRobot.cpp
+37fb51dc44d9606c1e1ec9a90d252695 src/GotoPoint.cpp
+59a5ca7706f6b0bd1198b49da51c8601 src/Laser.cpp
+f65781056407a22a7beb1bd3581c1106 src/RCISMousePicker.cpp
 902fc34a1c2f30f456be7d9430897482 src/ui_mainUI.h

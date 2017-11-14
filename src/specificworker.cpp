@@ -275,6 +275,30 @@ void SpecificWorker::setPick(const RoboCompRCISMousePicker::Pick& pick)
   std::cout << "Location z -> " << pick.z << " was chosen." << endl; 
 }
 
+void SpecificWorker::go(const string &nodo, const float x, const float y, const float alpha){
+  target.setTarget(x, y);
+  robotState = State::IDLE;
+  std::cout << "Location x -> " << x << " was chosen." << endl;
+  std::cout << "Location z -> " << y << " was chosen." << endl; 
+}
+
+void SpecificWorker::turn(const float speed){
+  differentialrobot_proxy->setSpeedBase(0, speed);
+}
+
+bool SpecificWorker::atTarget(){
+  std::pair<float, float> t = target.getTarget();
+  QVec tR = inner->transform("base", QVec::vec3(t.first, 0, t.second), "world"); //Vector's source is robot's location, vector's end is the mouse pick
+  float d = tR.norm2(); //Gets the distance, that equals the vector's module
+  //If no exit conditions
+  if(d < MINDISTANCE)
+    return true;
+  return false;
+}
+ 
+void SpecificWorker::stop(){
+  differentialrobot_proxy->setSpeedBase(0, 0);  
+}
 
 
 
